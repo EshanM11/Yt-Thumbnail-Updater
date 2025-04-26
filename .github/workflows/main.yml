@@ -2,7 +2,7 @@ name: Update YouTube Thumbnail
 
 on:
   schedule:
-    - cron: '*/13 * * * *'  # Runs every 13 minutes
+    - cron: '*/1 * * * *'  # Runs every 13 minutes
   workflow_dispatch:  # Allows manual trigger if needed
 
 jobs:
