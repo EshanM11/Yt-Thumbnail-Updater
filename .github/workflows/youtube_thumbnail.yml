@@ -36,4 +36,4 @@ jobs:
       # Step 5: Run YouTube Thumbnail Script
       - name: Run YouTube Thumbnail Script
         run: |
-          python your_script.py  # Replace with the actual filename of your script
+          python main.py  # Replace with the actual filename of your script
