@@ -1,54 +1,33 @@
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from google.auth.transport.requests import Request  # ✅ Added missing import
-import os
-import pickle
+from google.oauth2 import service_account
 
-# Set up the API client
+# Define the API scopes
 SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-API_SERVICE_NAME = 'youtube'
-API_VERSION = 'v3'
 
-def get_sub_count(channel_id=None):
-    # Authenticate using OAuth 2.0
-    creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())  # ✅ Now will work correctly
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-    
-    youtube = build(API_SERVICE_NAME, API_VERSION, credentials=creds)
+# Your channel ID (replace with your real ID)
+CHANNEL_ID = "YOUR_CHANNEL_ID_HERE"
 
-    if channel_id:
-        # Fetch subscriber count for a specific channel ID
-        request = youtube.channels().list(
-            part="statistics",
-            id=channel_id
-        )
-    else:
-        # Fetch the authenticated user's default channel
-        request = youtube.channels().list(
-            part="statistics",
-            mine=True
-        )
-    
+def get_credentials():
+    """Load service account credentials from credentials.json"""
+    creds = service_account.Credentials.from_service_account_file(
+        'credentials.json', scopes=SCOPES
+    )
+    return creds
+
+def get_sub_count():
+    """Fetch the subscriber count from the YouTube API"""
+    creds = get_credentials()
+    youtube = build('youtube', 'v3', credentials=creds)
+
+    request = youtube.channels().list(
+        part='statistics',
+        id=CHANNEL_ID
+    )
     response = request.execute()
 
-    # Get subscriber count
-    subscriber_count = response['items'][0]['statistics']['subscriberCount']
-    return subscriber_count
+    sub_count = int(response['items'][0]['statistics']['subscriberCount'])
+    return sub_count
 
-# Call the function with the specific channel ID you want
-channel_id = "UC7pCcWylxb8DlbDNxJbkUlw"  # Replace this with your actual channel ID
-subs = get_sub_count(channel_id)
-print(f"Subscriber count: {subs}")
+if __name__ == "__main__":
+    subs = get_sub_count()
+    print(f"Subscriber count: {subs}")
