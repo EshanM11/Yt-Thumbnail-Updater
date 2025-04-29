@@ -1,28 +1,37 @@
-from googleapiclient.discovery import build
-from google.oauth2 import service_account
-
-SCOPES = ["https://www.googleapis.com/auth/youtube.readonly"]
-CHANNEL_ID = "UC7pCcWylxb8DlbDNxJbkUlw"  # Replace with your channel ID
-
-def get_credentials():
-    creds = service_account.Credentials.from_service_account_file(
-        'credentials.json', scopes=SCOPES
-    )
-    return creds
-
-def get_sub_count():
-    creds = get_credentials()
-    youtube = build('youtube', 'v3', credentials=creds)
-
-    request = youtube.channels().list(
-        part='statistics',
-        id=CHANNEL_ID
-    )
-    response = request.execute()
-
-    sub_count = int(response['items'][0]['statistics']['subscriberCount'])
-    return sub_count
-
-if __name__ == "__main__":
-    subs = get_sub_count()
-    print(f"Subscriber count: {subs}")
+name: YouTube Thumbnail Automation
+ 
+ on:
+   schedule:
+     - cron: '*/10 * * * *'
+   workflow_dispatch:
+ 
+ jobs:
+   upload_thumbnail:
+     runs-on: ubuntu-latest
+ 
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v2
+ 
+       - name: Set up Python
+         uses: actions/setup-python@v2
+         with:
+           python-version: '3.x'
+ 
+       - name: Install dependencies
+         run: |
+           python -m pip install --upgrade pip
+           pip install -r requirements.txt
+ 
+       - name: Set environment variables
+         run: |
+           echo "GCP_CREDENTIALS_BASE64=${{ secrets.GCP_CREDENTIALS_BASE64 }}" >> $GITHUB_ENV
+           echo "GCP_TOKEN_BASE64=${{ secrets.GCP_TOKEN_BASE64 }}" >> $GITHUB_ENV
+ 
+       - name: Recreate credentials.json
+         run: |
+           echo "${{ secrets.GCP_CREDENTIALS_BASE64 }}" | base64 --decode > credentials.json
+ 
+       - name: Run YouTube Thumbnail Script
+         run: |
+           python main.py
