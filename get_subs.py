@@ -1,21 +1,16 @@
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 
-# Define the API scopes
-SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-
-# Your channel ID (replace with your real ID)
-CHANNEL_ID = "YOUR_CHANNEL_ID_HERE"
+SCOPES = ["https://www.googleapis.com/auth/youtube.readonly"]
+CHANNEL_ID = "UC7pCcWylxb8DlbDNxJbkUlw"  # Replace with your channel ID
 
 def get_credentials():
-    """Load service account credentials from credentials.json"""
     creds = service_account.Credentials.from_service_account_file(
         'credentials.json', scopes=SCOPES
     )
     return creds
 
 def get_sub_count():
-    """Fetch the subscriber count from the YouTube API"""
     creds = get_credentials()
     youtube = build('youtube', 'v3', credentials=creds)
 
