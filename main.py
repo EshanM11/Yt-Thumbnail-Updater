@@ -1,9 +1,8 @@
-
 from get_subs import get_sub_count
 from generate_thumbnail import generate_thumbnail
 from upload_thumbnail import upload_thumbnail
 
-VIDEO_ID = "NDc6WR83RrM"
+VIDEO_ID = "YgyD7ntXVMg"
 
 def main():
     subs = get_sub_count()
@@ -14,4 +13,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
